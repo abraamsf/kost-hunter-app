@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detail Kost - Kost Hunter</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+    <link rel="stylesheet" href="font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/tooplate-style.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <style>
+        .tm-detail-section { padding-top: 150px; padding-bottom: 50px; background-color: #f4f6f9; min-height: 100vh; }
+        #map { height: 350px; width: 100%; border-radius: 12px; z-index: 1; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card-custom { border: none; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
+        .booking-card { background: #fff; padding: 25px; border-radius: 10px; border: 1px solid #eee; }
+        .price-tag { color: #dc3545; font-weight: 700; font-size: 1.5rem; }
+    </style>
+</head>
+
+<body>
+    <div class="tm-main-content">
+        <div class="tm-top-bar-bg"></div>
+        <div class="tm-top-bar" id="tm-top-bar">
+            <div class="container">
+                <div class="row">
+                    <nav class="navbar navbar-expand-lg narbar-light">
+                        <a class="navbar-brand mr-auto" href="index.html">
+                            <img src="img/logo.png" alt="Logo"> Kost Hunter
+                        </a>
+                        <button type="button" id="nav-toggle" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div id="mainNav" class="collapse navbar-collapse tm-bg-white">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                                <li class="nav-item"><a class="nav-link" href="index.html#tm-section-4">Daftar Kost</a></li>
+                            </ul>
+                        </div>                            
+                    </nav>            
+                </div>
+            </div>
+        </div>
+
+        <div class="tm-detail-section">
+            <div class="container">
+                <a href="index.html" class="btn btn-secondary mb-4">← Kembali ke Daftar</a>
+                
+                <div class="card card-custom p-4 bg-white">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <img id="img" src="" class="img-fluid rounded mb-3 w-100" style="max-height: 400px; object-fit: cover; border-radius: 10px;">
+                            <h2 id="name" class="tm-color-primary" style="font-weight: 700;">Memuat...</h2>
+                            <p id="price" class="price-tag"></p>
+                            
+                            <hr>
+                            <h5 class="tm-color-primary">Fasilitas</h5>
+                            <p id="facilities" class="badge bg-info text-white p-2" style="font-size: 1rem;"></p>
+
+                            <h5 class="tm-color-primary mt-3">Deskripsi</h5>
+                            <p id="desc" class="text-muted"></p>
+
+                            <h5 class="tm-color-primary mt-4">Lokasi</h5>
+                            <div id="map"></div>
+                        </div>
+
+                        <div class="col-md-5 mt-4 mt-md-0">
+                            <div class="booking-card shadow-sm sticky-top" style="top: 100px;">
+                                <h3 class="mb-4 text-center">Form Pemesanan</h3>
+                                <form id="bookingForm">
+                                    <div class="form-group">
+                                        <label>Nama Lengkap</label>
+                                        <input type="text" id="custName" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email / WhatsApp</label>
+                                        <input type="text" id="custEmail" class="form-control" required>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Mulai Tanggal</label>
+                                                <input type="date" id="startDate" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="form-group">
+                                                <label>Durasi (Bulan)</label>
+                                                <input type="number" id="duration" class="form-control" value="1" min="1" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-muted">Total Bayar:</span>
+                                        <span id="totalDisplay" class="h4 text-success font-weight-bold">Rp 0</span>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary tm-btn-primary w-100 mt-4 py-3 font-weight-bold" style="border-radius: 5px;">
+                                        LANJUT PEMBAYARAN &rarr;
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="tm-bg-dark-blue">
+            <div class="container">
+                <div class="row">
+                    <p class="col-sm-12 text-center tm-font-light tm-color-white p-4 tm-margin-b-0">Copyright © 2025 Kost Hunter</p>        
+                </div>
+            </div>                
+        </footer>
+    </div>
+
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        let basePrice = 0;
+        let currentKost = null;
+        
+        // 1. Load Data Detail Kost
+        async function loadDetail() {
+            if (!id) { alert("ID tidak valid"); window.location.href = "index.html"; return; }
+
+            try {
+                const response = await fetch(`/api/kosts/${id}`);
+                if (!response.ok) throw new Error("Data tidak ditemukan");
+                
+                const kost = await response.json();
+                currentKost = kost;
+                basePrice = kost.price;
+
+                document.getElementById('name').innerText = kost.name;
+                document.getElementById('price').innerText = `Rp ${kost.price.toLocaleString('id-ID')}/bulan`;
+                document.getElementById('desc').innerText = kost.description;
+                document.getElementById('facilities').innerText = kost.facilities;
+                document.getElementById('img').src = kost.imageUrl || "https://picsum.photos/400/300";
+
+                // Isi otomatis nama user jika sudah login
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    document.getElementById('custName').value = user.name;
+                    document.getElementById('custEmail').value = user.email;
+                }
+
+                // Update Total Awal
+                updateTotal();
+                
+                // Init Peta
+                initMap(kost.latitude, kost.longitude, kost.name);
+
+            } catch (error) {
+                console.error(error);
+                alert("Gagal memuat data kost.");
+            }
+        }
+
+        // 2. Hitung Total Harga Realtime
+        function updateTotal() {
+            const duration = document.getElementById('duration').value || 1;
+            const total = basePrice * duration;
+            document.getElementById('totalDisplay').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        // Event Listener saat durasi berubah
+        document.getElementById('duration').addEventListener('input', updateTotal);
+        document.getElementById('duration').addEventListener('change', updateTotal);
+
+        // 3. LOGIKA SUBMIT BOOKING (PENTING!)
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah reload halaman
+
+            const startDate = document.getElementById('startDate').value;
+            if(!startDate) { alert("Harap pilih tanggal mulai!"); return; }
+
+            const duration = parseInt(document.getElementById('duration').value);
+            const totalPrice = basePrice * duration;
+
+            // Simpan Data Pesanan ke Penyimpanan Sementara (LocalStorage)
+            const bookingData = {
+                customerName: document.getElementById('custName').value,
+                customerEmail: document.getElementById('custEmail').value,
+                kostName: currentKost.name,
+                totalPrice: totalPrice,
+                durationInMonths: duration,
+                startDate: startDate, // Format: yyyy-MM-dd
+                status: "PENDING"
+            };
+
+            // Simpan & Pindah Halaman
+            localStorage.setItem('tempBooking', JSON.stringify(bookingData));
+            window.location.href = 'payment.html';
+        });
+
+        function initMap(lat, lng, title) {
+            if (!lat || !lng) { lat = -6.917; lng = 107.619; } 
+            const map = L.map('map').setView([lat, lng], 15);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+            L.marker([lat, lng]).addTo(map).bindPopup(`<b>${title}</b>`).openPopup();
+        }
+
+        loadDetail();
+    </script>
+</body>
+</html>

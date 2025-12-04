@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Kost Hunter</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
+        .btn-primary { background: #764ba2; border: none; }
+        .btn-primary:hover { background: #5a387e; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h3 class="text-center mb-4 font-weight-bold" style="color:#333;">Login Kost Hunter</h3>
+    
+    <div id="alertMsg" class="alert alert-danger d-none"></div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email" class="form-control" placeholder="admin@kost.com atau user@kost.com" required>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" class="form-control" placeholder="123" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block py-2">Masuk</button>
+    </form>
+    
+    <div class="mt-3 text-center small text-muted">
+        <p>Akun Demo:</p>
+        <p>Admin: <b>admin@kost.com</b> / <b>admin123</b></p>
+        <p>User: <b>user@kost.com</b> / <b>user123</b></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (res.ok) {
+                const user = await res.json();
+                
+                // Simpan data user di LocalStorage browser
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Cek Role
+                if (user.role === 'ADMIN') {
+                    window.location.href = 'admin.html'; // Ke Dashboard Admin
+                } else {
+                    window.location.href = 'index.html'; // Ke Halaman Pencari Kost
+                }
+            } else {
+                const msg = await res.text();
+                const alertBox = document.getElementById('alertMsg');
+                alertBox.innerText = msg;
+                alertBox.classList.remove('d-none');
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Gagal menghubungi server");
+        }
+    });
+</script>
+
+</body>
+</html>

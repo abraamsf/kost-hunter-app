@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pembayaran</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { background: #f4f6f9; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .qr-box { border: 2px dashed #ccc; padding: 20px; border-radius: 10px; background: #fff; display: inline-block; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="card shadow border-0 p-4 text-center" style="max-width: 450px; width: 100%;">
+    <h4 class="mb-3">Selesaikan Pembayaran</h4>
+    <p class="text-muted mb-0">Total Tagihan:</p>
+    <h2 class="text-primary font-weight-bold" id="payAmount">Rp 0</h2>
+
+    <div class="qr-box">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BayarKost" alt="QRIS">
+        <p class="mt-2 small font-weight-bold mb-0">Scan QRIS</p>
+    </div>
+
+    <p class="small text-danger">Selesaikan dalam <span id="timer">15:00</span> menit</p>
+
+    <button onclick="processPayment()" class="btn btn-success btn-block font-weight-bold py-2" id="btnBayar">
+        ✅ SAYA SUDAH BAYAR
+    </button>
+</div>
+
+<script>
+    // 1. Ambil data dari LocalStorage
+    const jsonString = localStorage.getItem('tempBooking');
+    console.log("Data di LocalStorage:", jsonString); // Cek di Console Browser (F12)
+
+    if (!jsonString) {
+        alert("Data booking kosong! Silakan pilih kost lagi.");
+        window.location.href = 'index.html';
+    }
+
+    const bookingData = JSON.parse(jsonString);
+    
+    // Tampilkan Harga
+    document.getElementById('payAmount').innerText = `Rp ${parseInt(bookingData.totalPrice).toLocaleString('id-ID')}`;
+
+    // 2. Fungsi Kirim Data ke Backend
+    async function processPayment() {
+        const btn = document.getElementById('btnBayar');
+        btn.innerText = "Memproses...";
+        btn.disabled = true;
+
+        try {
+            console.log("Mengirim data:", JSON.stringify(bookingData));
+
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+
+            // Baca respons dari server
+            const result = await res.text(); 
+            console.log("Respon Server:", result);
+
+            if (res.ok) {
+                localStorage.removeItem('tempBooking');
+                alert("✅ Pembayaran Berhasil! Kost telah dipesan.");
+                window.location.href = 'index.html';
+            } else {
+                throw new Error(result); // Lempar error server ke catch
+            }
+        } catch (err) {
+            console.error(err);
+            alert("❌ Gagal Booking: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Coba Lagi";
+        }
+    }
+</script>
+
+</body>
+</html>
