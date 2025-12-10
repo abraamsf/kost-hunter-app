@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detail Kost - Kost Hunter</title>
+    
+    <link rel="icon" href="kost.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800">
+    <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+    
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Open Sans', sans-serif; }
+        
+        /* Navbar */
+        .navbar { background: #343a40 !important; padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { color: white !important; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; font-size: 1.2rem; }
+        .nav-link { color: #ced4da !important; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; margin-left: 15px; }
+        .nav-link:hover { color: white !important; }
+        
+        /* Layout Detail */
+        .detail-container { margin-top: 40px; margin-bottom: 60px; }
+        .card-custom { border: none; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow: hidden; background: white; }
+        
+        /* Slider Foto */
+        .detail-slider { margin-bottom: 20px; border-radius: 8px; overflow: hidden; }
+        .detail-slider img { width: 100%; height: 400px; object-fit: cover; }
+        .slick-prev, .slick-next { z-index: 10; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; }
+        .slick-prev { left: 10px; } .slick-next { right: 10px; }
+
+        /* Peta */
+        #map { height: 350px; width: 100%; border-radius: 8px; z-index: 1; border: 1px solid #dee2e6; }
+        
+        /* Elemen Teks */
+        .text-theme { color: #343a40; font-weight: 800; letter-spacing: -0.5px; }
+        .price-tag { color: #5D7CA6; font-weight: 700; font-size: 1.8rem; margin-bottom: 15px; }
+        .badge-theme { background-color: #343a40; color: white; font-weight: 600; padding: 8px 15px; border-radius: 50px; font-size: 0.85rem; }
+        .section-title { color: #6c757d; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px; }
+        
+        /* Kotak Info Pemilik (Default Light) */
+        .owner-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-bottom: 25px; }
+        
+        /* Form Pemesanan */
+        .booking-box { background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .form-control { border: 1px solid #ced4da; height: 45px; border-radius: 4px; }
+        .form-control:focus { border-color: #5D7CA6; box-shadow: none; }
+        label { font-size: 0.85rem; font-weight: 700; color: #495057; display: block; margin-bottom: 5px; }
+        
+        /* Tombol */
+        .btn-primary { background-color: #5D7CA6; border: none; font-weight: 700; padding: 12px; border-radius: 4px; transition: 0.3s; letter-spacing: 0.5px; }
+        .btn-primary:hover { background-color: #343a40; transform: translateY(-2px); }
+        
+        .btn-outline-gmaps { border: 2px solid #5D7CA6; color: #5D7CA6; font-weight: 700; width: 100%; margin-top: 15px; border-radius: 4px; padding: 10px; }
+        .btn-outline-gmaps:hover { background-color: #5D7CA6; color: white; text-decoration: none; }
+
+        .btn-back { color: #6c757d; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-back:hover { color: #343a40; text-decoration: none; }
+    </style>
+
+    <style>
+        body { background: radial-gradient(circle at 20% 20%, #0b132b 0%, #000 75%); color: #e2e8f0; }
+        .navbar { background: linear-gradient(90deg, #0b132b 0%, #1e293b 60%, #0b132b 100%) !important; box-shadow: 0 10px 30px rgba(0,180,216,0.2); }
+        
+        /* Kartu Utama & Booking Box Transparan Gelap */
+        .card-custom, .booking-box { 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(8px); 
+            border: 1px solid rgba(58,134,255,0.15); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+            color: #e2e8f0; 
+        }
+
+        /* Override BG White Bootstrap */
+        .bg-white { background-color: transparent !important; }
+        
+        /* Owner Box Gelap */
+        .owner-box { 
+            background-color: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        
+        /* Warna Teks */
+        .section-title, .text-theme { color: #93c5fd; }
+        .price-tag { color: #4cc9f0; }
+        .text-dark { color: #e2e8f0 !important; }
+        .text-muted { color: #94a3b8 !important; }
+        label { color: #cbd5e1; }
+
+        /* Tombol */
+        .btn-primary { background: linear-gradient(90deg, #3a86ff, #00b4d8); box-shadow: 0 0 15px rgba(58,134,255,0.5); border: none; }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 25px rgba(0,180,216,0.6); background: linear-gradient(90deg, #4cc9f0, #3a86ff); }
+        .btn-outline-gmaps { border-color: #3a86ff; color: #3a86ff; }
+        .btn-outline-gmaps:hover { background: #3a86ff; color: #0b132b; }
+        
+        /* Slider & Form */
+        .detail-slider img { filter: saturate(1.1) contrast(1.05); }
+        .slick-prev, .slick-next { background: linear-gradient(135deg, #1e293b 0%, #0b132b 100%) !important; box-shadow: 0 0 10px rgba(58,134,255,0.4); }
+        .slick-prev:hover, .slick-next:hover { background: linear-gradient(135deg, #3a86ff 0%, #00b4d8 100%) !important; }
+        
+        .form-control { 
+            background-color: rgba(255,255,255,0.08); 
+            color:#fff; 
+            border: 1px solid rgba(58,134,255,0.25); 
+        }
+        .form-control:focus { background-color: rgba(255,255,255,0.15); color: #fff; }
+        
+        /* Border Pemisah */
+        .border-left { border-left: 1px solid rgba(255,255,255,0.1) !important; }
+        .border-top { border-top: 1px solid rgba(255,255,255,0.1) !important; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fa fa-building mr-2" style="color: #5D7CA6;"></i> KOST HUNTER
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+                <span class="fa fa-bars text-white"></span>
+            </button>
+            <div id="mainNav" class="collapse navbar-collapse">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html#tm-section-4">Katalog</a></li>
+                </ul>
+            </div>                            
+        </div>
+    </nav>
+
+    <div class="container detail-container">
+        <a href="index.html" class="btn-back mb-4">
+            <i class="fa fa-arrow-left mr-2"></i> KEMBALI KE DAFTAR
+        </a>
+        
+        <div class="card card-custom">
+            <div class="card-body p-0">
+                <div class="row no-gutters">
+                    
+                    <div class="col-lg-7 p-5">
+                        <div class="detail-slider" id="imageSlider">
+                        </div>
+                        
+                        <h2 id="name" class="text-theme mb-2">Memuat...</h2>
+                        <p id="price" class="price-tag"></p>
+                        <p class="text-muted"><span id="availabilityLabel">Ketersediaan:</span> <span id="availability" class="font-weight-bold">-</span></p>
+                        
+                        <div class="owner-box">
+                            <h6 class="section-title text-primary mb-3">DIKELOLA OLEH</h6>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fa fa-user-circle mr-3 text-secondary" style="font-size: 1.5rem;"></i>
+                                <div><span class="text-muted small font-weight-bold d-block">NAMA PEMILIK</span><span id="ownerName" class="font-weight-bold h6">-</span></div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-whatsapp mr-3 text-success" style="font-size: 1.5rem;"></i>
+                                <div><span class="text-muted small font-weight-bold d-block">WHATSAPP / TELEPON</span><span id="ownerPhone" class="font-weight-bold h6">-</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4"><h6 class="section-title">FASILITAS UTAMA</h6><span id="facilities" class="badge badge-theme"></span></div>
+                        <div class="mb-4"><h6 class="section-title">DESKRIPSI LENGKAP</h6><p id="desc" class="text-dark text-justify" style="line-height: 1.8; color: #495057;"></p></div>
+
+                        <div>
+                            <h6 class="section-title mb-3">LOKASI MAPS</h6>
+                            <div id="map"></div>
+                            <a id="gmapsLink" href="#" target="_blank" class="btn btn-outline-gmaps">
+                                <i class="fa fa-map-marker mr-2"></i> BUKA DI GOOGLE MAPS
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5 border-left p-5">
+                        <div class="booking-box sticky-top" style="top: 100px;">
+                            <h4 class="mb-4 text-theme text-center">Ajukan Sewa</h4>
+                            <form id="bookingForm">
+                                <div class="form-group">
+                                    <label>NAMA LENGKAP</label>
+                                    <input type="text" id="custName" class="form-control" placeholder="Nama penyewa..." required>
+                                </div>
+                                <div class="form-group">
+                                    <label>EMAIL / WHATSAPP</label>
+                                    <input type="text" id="custEmail" class="form-control" placeholder="Kontak yang bisa dihubungi..." required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>MULAI TANGGAL</label>
+                                            <input type="date" id="startDate" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>DURASI (BULAN)</label>
+                                            <input type="number" id="duration" class="form-control" value="1" min="1" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-4 mb-4 pt-3 border-top">
+                                    <span class="text-muted font-weight-bold">Total Pembayaran</span>
+                                    <span id="totalDisplay" class="h4 text-success font-weight-bold mb-0">Rp 0</span>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block py-3">
+                                    LANJUT PEMBAYARAN →
+                                </button>
+                                <p class="text-muted small text-center mt-3">*Hubungi pemilik via nomor di kiri jika ada pertanyaan.</p>
+                            </form>
+                        </div>
+                        
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-custom mt-4">
+        <div class="card-body p-5">
+            <h4 class="text-theme mb-4">Ulasan & Rating</h4>
+            <div id="reviewsList" class="mb-3"></div>
+            <div id="reviewFormBox" class="mb-5">
+                <div class="form-group">
+                    <label>Rating</label>
+                    <div id="starPicker" class="mb-2"></div>
+                    <input type="hidden" id="reviewRating" value="5">
+                </div>
+                <div class="form-group">
+                    <label>Ulasan</label>
+                    <textarea id="reviewText" class="form-control" rows="3" placeholder="Tulis pengalamanmu..."></textarea>
+                </div>
+                <button id="btnReview" class="btn btn-primary">Kirim Ulasan</button>
+            </div>
+
+            <h4 class="text-theme mb-3">Komentar</h4>
+            <div id="commentsList" class="mb-3"></div>
+            <div id="commentFormBox" class="form-group">
+                <textarea id="commentText" class="form-control" rows="2" placeholder="Tulis komentar..."></textarea>
+                <button id="btnComment" class="btn btn-primary mt-2">Kirim Komentar</button>
+                <div id="commentNotice" class="text-muted small mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="authModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#0b132b; color:#fff; border:1px solid rgba(58,134,255,0.3); box-shadow:0 0 20px rgba(0,180,216,0.4)">
+          <div class="modal-body text-center">
+            <h5 class="mb-3">Kamu belum terdaftar</h5>
+            <p class="mb-4">Daftar sekarang!</p>
+            <a href="register.html" class="btn btn-primary">Daftar Sekarang</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="slick/slick.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+    let basePrice = 0; 
+    let currentKost = null;
+    
+    async function loadDetail() {
+        if (!id) { window.location.href = "index.html"; return; }
+        
+        try {
+            const response = await fetch(`/api/kosts/${id}`);
+            if (!response.ok) throw new Error("Gagal mengambil data");
+            
+            const kost = await response.json();
+            currentKost = kost; 
+            basePrice = kost.price;
+
+            // --- ISI DATA TEKS ---
+            document.getElementById('name').innerText = kost.name;
+            document.getElementById('price').innerText = `Rp ${kost.price.toLocaleString('id-ID')} / bulan`;
+            document.getElementById('desc').innerText = kost.description;
+            document.getElementById('facilities').innerText = kost.facilities;
+            document.getElementById('ownerName').innerText = kost.ownerName || "Admin Kost Hunter";
+            document.getElementById('ownerPhone').innerText = kost.ownerPhone || "Hubungi via Aplikasi";
+
+            // --- SLIDER FOTO ---
+            const slider = $('#imageSlider');
+            let images = kost.images && kost.images.length > 0 ? kost.images : [];
+            // Fallback jika tidak ada gambar sama sekali
+            if (images.length === 0) images.push(kost.imageUrl || "https://picsum.photos/400/300");
+
+            images.forEach(img => {
+                slider.append(`<div><img src="${img}" onerror="this.src='https://picsum.photos/400/300'"></div>`);
+            });
+
+            slider.slick({ dots: true, arrows: true, autoplay: true });
+
+            // --- AUTO FILL DATA USER (Jika Login) ---
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) { 
+                document.getElementById('custName').value = user.name; 
+                document.getElementById('custEmail').value = user.email; 
+            }
+            
+            document.getElementById('availability').innerText = `${(kost.availableRooms ?? 0)} kamar`;
+
+            const btnSubmit = document.querySelector('#bookingForm button[type="submit"]');
+            if (!kost.availableRooms || kost.availableRooms <= 0) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerText = 'KAMAR PENUH';
+            } else {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'LANJUT PEMBAYARAN →';
+            }
+
+            updateTotal();
+            
+            // --- INISIALISASI MAP (PENTING) ---
+            // Kita pass data latitude & longitude dari database ke fungsi ini
+            initMap(kost.latitude, kost.longitude, kost.name);
+
+        } catch (error) { 
+            console.error("Error loading detail:", error);
+            alert("Terjadi kesalahan memuat data kost.");
+        }
+    }
+
+    function updateTotal() {
+        const duration = document.getElementById('duration').value || 1;
+        const total = basePrice * duration;
+        document.getElementById('totalDisplay').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+    
+    document.getElementById('duration').addEventListener('input', updateTotal);
+
+    // --- LOGIKA MAPS YANG SUDAH DIPERBAIKI ---
+    function initMap(lat, lng, title) {
+        // 1. Validasi Data: Pastikan lat & lng adalah ANGKA
+        // Jika data dari database null/kosong, kita pakai default (Bandung)
+        let latitude = parseFloat(lat);
+        let longitude = parseFloat(lng);
+
+        if (isNaN(latitude) || isNaN(longitude)) {
+            console.warn("Koordinat tidak valid, menggunakan lokasi default.");
+            latitude = -6.917; // Default Bandung
+            longitude = 107.619;
+        } 
+        
+        // 2. Render Peta Leaflet (Tampilan di Web)
+        const map = L.map('map').setView([latitude, longitude], 15);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup(`<b>${title}</b>`)
+            .openPopup();
+        
+        // 3. PERBAIKAN TOMBOL GOOGLE MAPS (SOLUSI MASALAH KAMU)
+        // Menggunakan format URL standar Google Maps yang pasti jalan
+        const gmapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        
+        const btnMaps = document.getElementById('gmapsLink');
+        btnMaps.href = gmapsUrl;     // Set link tujuan
+        btnMaps.target = "_blank";   // Wajib: Buka di tab baru
+    }
+
+    // Handle Form Submit
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'USER') { showAuthModal(); return; }
+        const bookingData = {
+            customerName: document.getElementById('custName').value,
+            customerEmail: document.getElementById('custEmail').value,
+            kostName: currentKost.name,
+            kostId: currentKost.id,
+            totalPrice: basePrice * parseInt(document.getElementById('duration').value),
+            durationInMonths: parseInt(document.getElementById('duration').value),
+            startDate: document.getElementById('startDate').value,
+            status: "PENDING"
+        };
+        localStorage.setItem('tempBooking', JSON.stringify(bookingData));
+        window.location.href = 'payment.html';
+    });
+
+    function renderStars(n) {
+        let s = '';
+        for (let i = 1; i <= 5; i++) s += `<span style="color:${i<=n?'#ffc107':'#e0e0e0'};font-size:20px;">★</span>`;
+        return s;
+    }
+
+    function initStarPicker() {
+        const picker = document.getElementById('starPicker');
+        picker.innerHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'btn btn-link p-0 mr-1';
+            btn.innerHTML = `<span style="color:#e0e0e0;font-size:24px;">★</span>`;
+            btn.addEventListener('click', () => {
+                document.getElementById('reviewRating').value = i;
+                [...picker.children].forEach((b, idx) => { b.innerHTML = `<span style="color:${idx+1<=i?'#ffc107':'#e0e0e0'};font-size:24px;">★</span>`; });
+            });
+            picker.appendChild(btn);
+        }
+        document.getElementById('reviewRating').value = 5;
+        [...picker.children].forEach((b, idx) => { b.innerHTML = `<span style="color:${idx+1<=5?'#ffc107':'#e0e0e0'};font-size:24px;">★</span>`; });
+    }
+
+    async function loadReviews() {
+        const res = await fetch(`/api/reviews?kostId=${id}`);
+        const list = await res.json();
+        let html = '';
+        if (!list || list.length === 0) html = '<p class="text-muted">Belum ada ulasan.</p>';
+        else list.forEach(r => { html += `<div class="mb-3">${renderStars(r.rating)}<div class="small text-muted">${r.userName || 'Anonim'} • ${new Date(r.createdAt).toLocaleString('id-ID')}</div><div>${r.text || ''}</div></div>`; });
+        document.getElementById('reviewsList').innerHTML = html;
+    }
+
+    async function loadComments() {
+        const res = await fetch(`/api/comments?kostId=${id}`);
+        const list = await res.json();
+        const byParent = {};
+        list.forEach(c => { (byParent[c.parentId || 0] = byParent[c.parentId || 0] || []).push(c); });
+        function renderThread(parentId) {
+            const arr = byParent[parentId || 0] || [];
+            let html = '';
+            arr.forEach(c => {
+                html += `<div class="mb-3" style="margin-left:${parentId?20:0}px;"><div class="small text-muted">${c.userName || 'User'} • ${new Date(c.createdAt).toLocaleString('id-ID')}</div><div>${c.content}</div><button class="btn btn-link p-0 small" onclick="openReply(${c.id})">Balas</button><div id="replyBox-${c.id}" class="mt-2" style="display:none;"><textarea class="form-control" rows="2" id="replyText-${c.id}" placeholder="Tulis balasan..."></textarea><button class="btn btn-primary btn-sm mt-2" onclick="submitReply(${c.id})">Kirim</button></div>`;
+                html += renderThread(c.id);
+                html += `</div>`;
+            });
+            return html;
+        }
+        document.getElementById('commentsList').innerHTML = renderThread(null);
+    }
+
+    function openReply(id) { const el = document.getElementById(`replyBox-${id}`); if (el) el.style.display = el.style.display==='none'?'block':'none'; }
+    async function submitReply(parentId) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'USER') { showAuthModal(); return; }
+        const content = document.getElementById(`replyText-${parentId}`).value;
+        const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, content, parentId };
+        const res = await fetch('/api/comments', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (res.ok) { loadComments(); }
+    }
+
+    document.getElementById('btnReview').addEventListener('click', async () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'USER') { showAuthModal(); return; }
+        const rating = parseInt(document.getElementById('reviewRating').value);
+        const text = document.getElementById('reviewText').value;
+        const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, rating, text };
+        const res = await fetch('/api/reviews', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (res.ok) { document.getElementById('reviewText').value=''; initStarPicker(); loadReviews(); }
+    });
+
+    document.getElementById('btnComment').addEventListener('click', async () => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'USER') { showAuthModal(); return; }
+        const content = document.getElementById('commentText').value;
+        const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, content };
+        const res = await fetch('/api/comments', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (res.ok) { document.getElementById('commentText').value=''; document.getElementById('commentNotice').innerText=''; loadComments(); }
+    });
+
+    function initAccessControls() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user || user.role !== 'USER') {
+            document.getElementById('commentNotice').innerText = 'Login sebagai USER untuk berkomentar.';
+        }
+    }
+
+    async function initExtras() {
+        initStarPicker();
+        await loadReviews();
+        await loadComments();
+        initAccessControls();
+    }
+
+    function showAuthModal() { $('#authModal').modal('show'); }
+
+    loadDetail();
+    initExtras();
+</script>
+</body>
+</html>

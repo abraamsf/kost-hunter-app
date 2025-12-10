@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pembayaran</title>
+    <link rel="icon" href="kost.jpg" type="image/jpg">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body { background: radial-gradient(circle, #0b132b 0%, #000 70%); height: 100vh; display: flex; align-items: center; justify-content: center; color:#e2e8f0; }
+        .card { background: rgba(2,6,23,0.6); border: 1px solid rgba(58,134,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(8px); color:#e2e8f0; }
+        .qr-box { border: 2px dashed rgba(76, 201, 240, 0.5); padding: 20px; border-radius: 10px; background: rgba(255,255,255,0.04); display: inline-block; margin: 20px 0; }
+        .text-primary { color: #4cc9f0 !important; }
+        .btn-primary { background: linear-gradient(90deg, #3a86ff, #00b4d8); box-shadow: 0 0 15px rgba(58,134,255,0.5); border: none; }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 25px rgba(0,180,216,0.6); background: linear-gradient(90deg, #4cc9f0, #3a86ff); }
+        .auth-popup { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1050; }
+        .auth-card { background: #0b132b; color:#fff; border:1px solid rgba(58,134,255,0.3); box-shadow:0 0 20px rgba(0,180,216,0.4); padding: 24px; border-radius: 8px; text-align: center; max-width: 360px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="card shadow border-0 p-4 text-center" style="max-width: 450px; width: 100%;">
+    <h4 class="mb-3">Selesaikan Pembayaran</h4>
+    <p class="text-muted mb-0">Total Tagihan:</p>
+    <h2 class="text-primary font-weight-bold" id="payAmount">Rp 0</h2>
+
+    <div class="qr-box">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=BayarKost" alt="QRIS">
+        <p class="mt-2 small font-weight-bold mb-0">Scan QRIS</p>
+    </div>
+
+    <p class="small text-danger">Selesaikan dalam <span id="timer">15:00</span> menit</p>
+
+    <button onclick="processPayment()" class="btn btn-primary btn-block font-weight-bold py-2" id="btnBayar">✅ SAYA SUDAH BAYAR</button>
+</div>
+
+<div id="authPopup" class="auth-popup" style="display:none">
+  <div class="auth-card">
+    <h5 class="mb-3">Kamu belum terdaftar</h5>
+    <p class="mb-4">Daftar sekarang!</p>
+    <a href="register.html" class="btn btn-primary">Daftar Sekarang</a>
+  </div>
+  </div>
+
+<script>
+    const jsonString = localStorage.getItem('tempBooking');
+
+    if (!jsonString) {
+        alert("Data booking kosong! Silakan pilih kost lagi.");
+        window.location.href = 'index.html';
+    }
+
+    const bookingData = JSON.parse(jsonString);
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    function showAuthPopup() { document.getElementById('authPopup').style.display = 'flex'; }
+    if (!currentUser || currentUser.role !== 'USER') { showAuthPopup(); document.getElementById('btnBayar').disabled = true; }
+    
+    document.getElementById('payAmount').innerText = `Rp ${parseInt(bookingData.totalPrice).toLocaleString('id-ID')}`;
+
+    async function processPayment() {
+        const btn = document.getElementById('btnBayar');
+        btn.innerText = "Memproses...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+
+            const result = await res.text(); 
+
+            if (res.ok) {
+                localStorage.removeItem('tempBooking');
+                alert("✅ Pembayaran Berhasil! Kost telah dipesan.");
+                window.location.href = 'index.html';
+            } else {
+                throw new Error(result);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("❌ Gagal Booking: " + err.message);
+            btn.disabled = false;
+            btn.innerText = "Coba Lagi";
+        }
+    }
+</script>
+
+</body>
+</html>

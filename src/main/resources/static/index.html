@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kost Hunter</title>
+
+    <link rel="icon" href="kost.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="slick/slick-theme.css"/>
+    <link rel="stylesheet" href="css/tooplate-style.css">
+
+    <style>
+        /* --- TEMA DEFAULT (Light) --- */
+        body { background-color: #f4f6f9; font-family: 'Open Sans', sans-serif; }
+        
+        /* NAVBAR */
+        .tm-top-bar { 
+            background: #343a40 !important; 
+            padding: 0; 
+            height: 70px; 
+            display: flex; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 1000;
+        }
+        
+        .navbar { padding: 0; height: 100%; width: 100%; }
+        
+        .navbar-brand { 
+            color: #fff !important; font-weight: 800; letter-spacing: 1px; 
+            font-size: 1.4rem; display: flex; align-items: center; height: 100%;
+        }
+        .logo-icon { color: #5D7CA6; margin-right: 10px; font-size: 1.8rem; }
+        
+        .navbar-nav { display: flex; align-items: center; height: 100%; }
+
+        .nav-item {
+            display: flex; align-items: center; height: 40%; 
+            border-right: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 0 5px;
+        }
+        .nav-item:last-child { border-right: none; }
+
+        .nav-link { 
+            color: #ced4da !important; font-weight: 600; text-transform: uppercase; 
+            font-size: 0.85rem; padding: 8px 15px !important; 
+            margin: 0 5px !important; 
+            border-radius: 4px; transition: all 0.3s ease; border: none !important;
+        }
+        
+        .nav-link:hover { color: #fff !important; background-color: rgba(255, 255, 255, 0.1); }
+        
+        .btn-login-nav {
+            background-color: #5D7CA6 !important; color: white !important;
+            padding: 8px 25px !important; border-radius: 50px; font-size: 0.85rem;
+            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
+            margin-left: 15px !important; border: none !important;
+        }
+        .btn-login-nav:hover { background-color: #4a6b94 !important; text-decoration: none; box-shadow: 0 4px 10px rgba(93, 124, 166, 0.4); }
+        .btn-logout-nav { background-color: #c0392b !important; }
+        .btn-logout-nav:hover { background-color: #a93226 !important; }
+
+        /* SEARCH BAR & HERO */
+        #tm-section-1 {
+            background-image: url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1920') !important;
+            background-size: cover; background-position: center;
+            box-shadow: inset 0 0 0 2000px rgba(44, 62, 80, 0.6);
+            padding: 120px 0; min-height: 500px; display: flex; align-items: center;
+        }
+        
+        .search-minimal-container {
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px);
+            padding: 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 20px; max-width: 750px; margin-left: auto; margin-right: auto;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .input-group-minimal { display: flex; width: 100%; background: white; border-radius: 6px; overflow: hidden; height: 50px; }
+        .search-input-wrapper { position: relative; flex-grow: 1; display: flex; align-items: center; }
+        .input-field-minimal { border: none; height: 100%; width: 100%; padding-left: 45px; padding-right: 40px; font-size: 1rem; color: #495057; outline: none; }
+        .icon-map { position: absolute; left: 15px; color: #adb5bd; font-size: 1.2rem; pointer-events: none; }
+        #resetBtn { position: absolute; right: 15px; color: #adb5bd; font-size: 1.1rem; cursor: pointer; display: none; transition: color 0.3s; }
+        #resetBtn:hover { color: #dc3545; }
+        
+        .btn-search-minimal {
+            background-color: #5D7CA6; color: white; border: none; padding: 0 30px;
+            font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer;
+            height: 100%; white-space: nowrap; transition: background 0.3s;
+        }
+        .btn-search-minimal:hover { background-color: #343a40; }
+
+        /* KARTU REKOMENDASI */
+        .slick-track { display: flex !important; gap: 20px; align-items: stretch; }
+        .slick-slide { height: auto !important; display: flex !important; float: none !important; }
+        
+        .tm-carousel-item { 
+            background: white; border-radius: 8px; border: 1px solid #e9ecef;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03); overflow: hidden; 
+            display: flex !important; flex-direction: column; width: 100%;
+        }
+        .tm-article-pad { flex: 1; display: flex; flex-direction: column; padding: 20px; justify-content: space-between; }
+        .tm-article-title-2 { color: #343a40; font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; height: 3rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .tm-color-primary { color: #5D7CA6 !important; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; }
+        .desc-text { color: #6c757d; font-size: 0.9rem; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .btn-detail { background-color: #5D7CA6; color: white; border: none; font-weight: 600; padding: 10px; width: 100%; border-radius: 4px; margin-top: auto; display: block; text-align: center; text-decoration: none; font-size: 0.9rem; }
+        .btn-detail:hover { background-color: #343a40; color: white; text-decoration: none; }
+
+        .slick-prev, .slick-next { width: 35px; height: 35px; background: #343a40 !important; border-radius: 50%; z-index: 10; }
+        .slick-prev:hover, .slick-next:hover { background: #5D7CA6 !important; transform: scale(1.1); }
+        .slick-prev { left: -40px; } .slick-next { right: -40px; }
+        
+        @media (max-width: 991px) {
+            .slick-prev { left: 0; } .slick-next { right: 0; }
+            .nav-item { border-right: none; display: block; height: auto; text-align: center; margin-bottom: 10px; }
+            .btn-login-nav { margin-left: 0; display: inline-block; }
+        }
+    </style>
+    
+    <style>
+        body { background: radial-gradient(circle, #0b132b 0%, #000 70%); color:#e2e8f0; }
+        .tm-top-bar { background: linear-gradient(90deg, #0b132b, #1e293b, #0b132b) !important; box-shadow: 0 10px 30px rgba(0,180,216,0.2); }
+        .search-minimal-container { background: rgba(2,6,23,0.6); border: 1px solid rgba(58,134,255,0.15); backdrop-filter: blur(8px); }
+        .input-group-minimal { background: rgba(255,255,255,0.08); }
+        .btn-detail, .btn-login-nav, .btn-search-minimal { background: linear-gradient(90deg, #3a86ff, #00b4d8); color:#fff; box-shadow: 0 0 15px rgba(58,134,255,0.5); border: none; }
+        .btn-detail:hover, .btn-login-nav:hover, .btn-search-minimal:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 25px rgba(0,180,216,0.6); background: linear-gradient(90deg, #4cc9f0, #3a86ff); }
+        
+        /* WARNA KARTU LEBIH PEKAT & BORDER BIRU */
+        .tm-carousel-item { background: rgba(15, 23, 42, 0.8) !important; border: 1px solid rgba(58,134,255,0.2) !important; backdrop-filter: blur(8px) !important; }
+        
+        /* WARNA JUDUL ARTIKEL */
+        .tm-article-title-2 { color: #93c5fd !important; }
+        .tm-color-primary { color: #4cc9f0 !important; }
+        
+        footer.bg-dark { background: #0b132b !important; }
+
+        #tm-section-4.bg-white {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+
+        .desc-text { 
+            color: #cbd5e1 !important; /* Warna abu-abu terang */
+        }
+        
+        #tm-section-4 h2 {
+            color: #e2e8f0 !important;
+        }
+
+        /* --- PERBAIKAN DI SINI: WARNA DOTS SLICK CAROUSEL --- */
+        .slick-dots li button:before {
+            color: #fff !important; /* Ubah warna titik menjadi putih */
+            opacity: 0.5;
+            font-size: 12px; /* Memperbesar ukuran titik */
+        }
+        
+        .slick-dots li.slick-active button:before {
+            color: #4cc9f0 !important; /* Warna biru muda saat aktif */
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tm-main-content">
+        <div class="tm-top-bar" id="tm-top-bar">
+            <div class="container h-100">
+                <nav class="navbar navbar-expand-lg h-100">
+                    <a class="navbar-brand" href="#">
+                        <i class="fa fa-building logo-icon"></i> KOST HUNTER
+                    </a>
+                    
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav">
+                        <span class="fa fa-bars text-white"></span>
+                    </button>
+                    
+                    <div id="mainNav" class="collapse navbar-collapse h-100">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item"><a class="nav-link" href="#top">HOME</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#tm-section-4">KATALOG</a></li>
+                            <li class="nav-item border-0" id="authBtnItem">
+                                <a class="btn-login-nav" href="login.html">LOGIN</a>
+                            </li>
+                        </ul>
+                    </div>                            
+                </nav>            
+            </div>
+        </div>
+
+        <div class="tm-section tm-bg-img" id="tm-section-1">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-lg-8 text-center">
+                        <h1 class="text-white font-weight-bold mb-3" style="text-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 2.5rem;">
+                            Cari Hunian Nyaman
+                        </h1>
+                        <div class="search-minimal-container">
+                            <div class="input-group-minimal">
+                                <div class="search-input-wrapper">
+                                    <i class="fa fa-map-marker icon-map"></i>
+                                    <input type="text" id="searchInput" class="input-field-minimal" placeholder="Mau cari kost di mana? (Contoh: Dago)">
+                                    <i class="fa fa-times-circle" id="resetBtn"></i>
+                                </div>
+                                <button class="btn-search-minimal" type="button" id="searchBtn">CARI KOST</button>
+                            </div>
+                        </div>
+                    </div>                        
+                </div>      
+            </div>                  
+        </div>
+        
+        <div class="tm-section tm-section-pad bg-white" id="tm-section-4">
+            <div class="container">
+                <h2 class="text-center mb-5 font-weight-bold" style="color: #343a40;">Rekomendasi Terbaru</h2>
+                <div class="tm-article-carousel" id="kost-container">
+                    <div class="text-center p-5 text-muted">
+                        <i class="fa fa-spinner fa-spin fa-3x mb-3"></i><br>Sedang memuat data...
+                    </div>
+                </div>    
+            </div>
+        </div>
+        
+        <footer class="bg-dark text-white py-4 text-center">
+            <p class="mb-0 small text-muted">© 2025 Kost Hunter. All Rights Reserved.</p>
+        </footer>
+    </div>
+    
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="slick/slick.min.js"></script>
+    
+    <script>
+        const PLACEHOLDER_IMG = "https://picsum.photos/400/300?grayscale"; 
+        
+        async function loadKosts(keyword = '') {
+            try {
+                let url = '/api/kosts'; 
+                if(keyword) url += `?keyword=${keyword}`;
+                
+                const response = await fetch(url); 
+                const kosts = await response.json();
+                
+                const container = $('#kost-container');
+                if (container.hasClass('slick-initialized')) container.slick('unslick');
+                container.empty();
+
+                if (kosts.length === 0) {
+                    container.html('<div class="text-center p-5 w-100"><h5>Tidak ada kost yang ditemukan :(</h5></div>');
+                    return;
+                }
+
+                kosts.forEach(kost => {
+                    let imageToDisplay = PLACEHOLDER_IMG;
+                    if (kost.images && kost.images.length > 0) {
+                        imageToDisplay = kost.images[0];
+                    } else if (kost.imageUrl) {
+                        imageToDisplay = kost.imageUrl;
+                    }
+
+                    const htmlItem = `
+                        <article class="tm-carousel-item">
+                            <img src="${imageToDisplay}" class="img-fluid" style="height: 200px; width: 100%; object-fit: cover;" onerror="this.src='${PLACEHOLDER_IMG}'">
+                            <div class="tm-article-pad">
+                                <div>
+                                    <h3 class="tm-article-title-2">${kost.name}</h3>
+                                    <p class="tm-color-primary">Rp ${kost.price.toLocaleString('id-ID')}</p>
+                                </div>
+                                <p class="desc-text">${kost.description}</p>
+                                <a href="detail.html?id=${kost.id}" class="btn-detail">LIHAT DETAIL</a>
+                            </div>                                
+                        </article>
+                    `;
+                    container.append(htmlItem);
+                });
+
+                $('.tm-article-carousel').slick({
+                    infinite: true, dots: true, slidesToShow: 3, slidesToScroll: 1, 
+                    autoplay: true, autoplaySpeed: 3000, arrows: true, 
+                    responsive: [{ breakpoint: 992, settings: { slidesToShow: 2 } }, { breakpoint: 576, settings: { slidesToShow: 1, arrows: false } }]
+                });
+            } catch (error) { 
+                console.error("Gagal Load:", error); 
+                $('#kost-container').html('<p class="text-center text-danger">Gagal menghubungkan ke server.</p>');
+            }
+        }
+
+        function doLogout() { localStorage.clear(); window.location.href = 'login.html'; }
+
+        $(document).ready(function(){
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                $('#authBtnItem').html(`<a class="btn-login-nav btn-logout-nav" href="#" onclick="doLogout()">LOGOUT (${user.name.split(' ')[0]})</a>`);
+            }
+            
+            loadKosts();
+
+            $('#searchInput').on('input', function() { $(this).val().length>0?$('#resetBtn').fadeIn():$('#resetBtn').fadeOut(); });
+            $('#resetBtn').click(function() { $('#searchInput').val(''); $(this).fadeOut(); loadKosts(); });
+            
+            $('#searchBtn').click(() => loadKosts($('#searchInput').val()));
+            $('#searchInput').keypress(function(e) {
+                if(e.which == 13) { e.preventDefault(); loadKosts($('#searchInput').val()); }
+            });
+        });
+    </script>
+</body>
+</html>

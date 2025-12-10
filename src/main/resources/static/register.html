@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Daftar Akun - Kost Hunter</title>
+    <link rel="icon" href="kost.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        body { background: radial-gradient(circle, #0b132b 0%, #000 70%); height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Open Sans', sans-serif; color:#e2e8f0; }
+        .login-card { background: rgba(2,6,23,0.6); padding: 40px; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); width: 100%; max-width: 400px; border: 1px solid rgba(58,134,255,0.15); backdrop-filter: blur(8px); color:#e2e8f0; }
+        h4 { color: #93c5fd; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        .form-control, .custom-select { background-color: rgba(255,255,255,0.08); border: 1px solid rgba(58,134,255,0.2); height: 50px; border-radius: 4px; color:#e2e8f0; }
+        label { color: #cbd5e1; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; }
+        .btn-primary { background: linear-gradient(90deg, #3a86ff, #00b4d8); border: none; font-weight: 700; padding: 12px; border-radius: 4px; transition: all 0.3s; box-shadow: 0 0 15px rgba(58,134,255,0.5); }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 25px rgba(0,180,216,0.6); background: linear-gradient(90deg, #4cc9f0, #3a86ff); }
+        .link-text { color: #4cc9f0; font-weight: 600; text-decoration: none; }
+        .link-text:hover { color: #93c5fd; text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="text-center mb-4">
+        <h4>BUAT AKUN BARU</h4>
+        <p class="text-muted small">Pilih peran Anda dan bergabunglah</p>
+    </div>
+    
+    <div id="alertMsg" class="alert d-none small text-center border-0"></div>
+
+    <form id="registerForm">
+        <div class="form-group">
+            <label>NAMA LENGKAP</label>
+            <input type="text" id="regName" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>EMAIL</label>
+            <input type="email" id="regEmail" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>PASSWORD</label>
+            <input type="password" id="regPassword" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label>DAFTAR SEBAGAI</label>
+            <select id="regRole" class="form-control custom-select" required>
+                <option value="USER">Pencari Kost (User)</option>
+                <option value="ADMIN">Pemilik Kost (Admin)</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">DAFTAR SEKARANG</button>
+    </form>
+    
+    <div class="mt-4 text-center">
+        <p class="small text-muted">Sudah punya akun? <a href="login.html" class="link-text">Login disini</a></p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const newUser = {
+            name: document.getElementById('regName').value,
+            email: document.getElementById('regEmail').value,
+            password: document.getElementById('regPassword').value,
+            role: document.getElementById('regRole').value // Ambil nilai dropdown
+        };
+
+        const alertBox = document.getElementById('alertMsg');
+        alertBox.classList.add('d-none');
+
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newUser)
+            });
+
+            if (res.ok) {
+                alertBox.className = "alert alert-success small text-center border-0";
+                alertBox.innerText = "Registrasi Berhasil! Silakan Login.";
+                alertBox.classList.remove('d-none');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+            } else {
+                const msg = await res.text();
+                alertBox.className = "alert alert-danger small text-center border-0";
+                alertBox.innerText = msg;
+                alertBox.classList.remove('d-none');
+            }
+        } catch (err) { alert("Gagal menghubungi server"); }
+    });
+</script>
+</body>
+</html>

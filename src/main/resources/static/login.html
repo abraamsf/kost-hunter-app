@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - Kost Hunter</title>
+    <link rel="icon" href="kost.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <style>
+        /* TEMA: Clean Slate & Muted Blue */
+        body { background-color: #f4f6f9; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Open Sans', sans-serif; }
+        
+        .login-card { 
+            background: white; padding: 40px; border-radius: 8px; 
+            box-shadow: 0 10px 25px rgba(52, 58, 64, 0.1); 
+            width: 100%; max-width: 400px; border: none; 
+        }
+        
+        h4 { color: #343a40; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .form-control { background-color: #f8f9fa; border: 1px solid #ced4da; height: 50px; border-radius: 4px; }
+        .form-control:focus { box-shadow: none; border-color: #5D7CA6; }
+        label { color: #6c757d; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .btn-primary { 
+            background-color: #5D7CA6; border: none; font-weight: 700; 
+            padding: 12px; border-radius: 4px; letter-spacing: 1px; transition: all 0.3s;
+        }
+        .btn-primary:hover { background-color: #343a40; transform: translateY(-2px); }
+        
+        .back-link { color: #adb5bd; font-size: 0.9rem; text-decoration: none; transition: 0.3s; }
+        .back-link:hover { color: #5D7CA6; text-decoration: none; }
+        
+        .register-link { color: #5D7CA6; font-weight: 600; text-decoration: none; }
+        .register-link:hover { color: #343a40; text-decoration: underline; }
+    </style>
+    <style>
+        body { background: radial-gradient(circle, #0b132b 0%, #000 70%); display: flex; align-items: center; justify-content: center; color:#e2e8f0; }
+        .login-card { background: rgba(2,6,23,0.6); border: 1px solid rgba(58,134,255,0.15); box-shadow: 0 20px 40px rgba(0,0,0,0.4); backdrop-filter: blur(8px); color:#e2e8f0; }
+        .btn-primary { background: linear-gradient(90deg, #3a86ff, #00b4d8); box-shadow: 0 0 15px rgba(58,134,255,0.5); border: none; }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 0 25px rgba(0,180,216,0.6); background: linear-gradient(90deg, #4cc9f0, #3a86ff); }
+        .back-link { color: #93c5fd; }
+        .register-link { color: #4cc9f0; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <div class="text-center mb-5">
+        <h4>KOST HUNTER</h4>
+        <p class="text-muted small">Login Portal Admin & User</p>
+    </div>
+    
+    <div id="alertMsg" class="alert alert-danger d-none small text-center border-0 bg-danger text-white"></div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label>EMAIL</label>
+            <input type="email" id="email" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>PASSWORD</label>
+            <input type="password" id="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mt-4">MASUK SEKARANG</button>
+    </form>
+    
+    <div class="mt-4 text-center">
+        <p class="small text-muted mb-2">Belum punya akun? <a href="register.html" class="register-link">Daftar disini</a></p>
+        <hr>
+        <a href="index.html" class="back-link">&larr; Kembali ke Katalog</a>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (res.ok) {
+                const user = await res.json();
+                localStorage.setItem('user', JSON.stringify(user));
+                window.location.href = user.role === 'ADMIN' ? 'admin.html' : 'index.html';
+            } else {
+                const alertBox = document.getElementById('alertMsg');
+                alertBox.innerText = "Email atau Password Salah";
+                alertBox.classList.remove('d-none');
+            }
+        } catch (err) { alert("Tidak dapat terhubung ke server"); }
+    });
+</script>
+</body>
+</html>

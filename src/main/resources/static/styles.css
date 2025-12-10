@@ -1,0 +1,105 @@
+/* General Styling */
+body {
+    background-color: #f4f6f9; /* Warna background abu-abu muda yang bersih */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%); /* Gradasi biru */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+/* Hero Section (Judul Utama) */
+h2.text-center {
+    color: #333;
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 40px;
+    text-transform: uppercase;
+    font-size: 1.8rem;
+    border-bottom: 3px solid #0d6efd;
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+/* Card Kost Styling */
+.card {
+    border: none;
+    border-radius: 12px;
+    background: #fff;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out; /* Animasi halus saat hover */
+}
+
+/* Efek saat mouse diarahkan ke kartu */
+.card:hover {
+    transform: translateY(-10px); /* Kartu naik sedikit */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Bayangan membesar */
+}
+
+.card-img-top {
+    height: 220px;
+    object-fit: cover; /* Agar gambar tidak gepeng */
+    border-bottom: 1px solid #eee;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.text-primary {
+    color: #0d6efd !important;
+    font-size: 1.1rem;
+}
+
+/* Tombol */
+.btn-primary, .btn-outline-primary {
+    border-radius: 50px; /* Tombol bulat */
+    padding: 8px 20px;
+    font-weight: 600;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1.1rem;
+    transition: background 0.3s;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Map Container di Halaman Detail */
+#map {
+    height: 400px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 2px solid #fff;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .card-img-top {
+        height: 180px;
+    }
+    
+    #map {
+        height: 300px; /* Map lebih kecil di HP */
+    }
+}
