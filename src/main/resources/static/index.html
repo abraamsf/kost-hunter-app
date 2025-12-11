@@ -195,9 +195,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-8 text-center">
-                        <h1 class="text-white font-weight-bold mb-3" style="text-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 2.5rem;">
-                            Cari Hunian Nyaman
-                        </h1>
+                        <h1 id="heroHeadline" class="text-white font-weight-bold mb-3 hero-headline" style="text-shadow: 0 4px 15px rgba(0,0,0,0.6); font-size: 2.5rem;"></h1>
                         <div class="search-minimal-container">
                             <div class="input-group-minimal">
                                 <div class="search-input-wrapper">
@@ -306,6 +304,37 @@
                 if(e.which == 13) { e.preventDefault(); loadKosts($('#searchInput').val()); }
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function(){
+            const texts = [
+                'Temukan Hunian Idaman Anda.',
+                'Hunian Nyaman, Harga Terjangkau.',
+                'Solusi Hunian Nyaman di Dekat Anda.',
+                'Kost Nyaman, Tempat Ideal untuk Tinggal.',
+                'Mencari Kost Nyaman? Kami Punya Jawabannya!',
+                'Tempat Tinggal Nyaman dan Strategis.'
+            ];
+            const el = document.getElementById('heroHeadline');
+            let i = 0;
+            function cycle(){
+                el.textContent = texts[i];
+                el.classList.remove('hide');
+                el.classList.add('show');
+                setTimeout(function(){
+                    el.classList.remove('show');
+                    el.classList.add('hide');
+                    i = (i + 1) % texts.length;
+                    setTimeout(cycle, 600);
+                }, 4000);
+            }
+            el.classList.add('hide');
+            setTimeout(cycle, 50);
+        });
     </script>
 </body>
 </html>
+    <style>
+        .hero-headline { opacity: 0; transform: translateY(8px); transition: opacity 600ms ease, transform 600ms ease; }
+        .hero-headline.show { opacity: 1; transform: translateY(0); }
+        .hero-headline.hide { opacity: 0; transform: translateY(-8px); }
+    </style>

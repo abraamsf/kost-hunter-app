@@ -111,6 +111,11 @@
         /* Border Pemisah */
         .border-left { border-left: 1px solid rgba(255,255,255,0.1) !important; }
         .border-top { border-top: 1px solid rgba(255,255,255,0.1) !important; }
+
+        /* Stars */
+        .star { color: #7a8ca8; font-size: 24px; transition: transform 0.15s, text-shadow 0.15s, color 0.15s; }
+        .star.active { color: #3a86ff; text-shadow: 0 0 8px rgba(58,134,255,0.7); }
+        .star:hover { color: #4cc9f0; text-shadow: 0 0 10px rgba(0,180,216,0.8); transform: scale(1.1); cursor: pointer; }
     </style>
 </head>
 
@@ -146,6 +151,7 @@
                         </div>
                         
                         <h2 id="name" class="text-theme mb-2">Memuat...</h2>
+                        <div id="avgRating" class="mb-2"></div>
                         <p id="price" class="price-tag"></p>
                         <p class="text-muted"><span id="availabilityLabel">Ketersediaan:</span> <span id="availability" class="font-weight-bold">-</span></p>
                         
@@ -227,21 +233,13 @@
                 <div class="form-group">
                     <label>Rating</label>
                     <div id="starPicker" class="mb-2"></div>
-                    <input type="hidden" id="reviewRating" value="5">
+                    <input type="hidden" id="reviewRating" value="0">
                 </div>
                 <div class="form-group">
                     <label>Ulasan</label>
-                    <textarea id="reviewText" class="form-control" rows="3" placeholder="Tulis pengalamanmu..."></textarea>
+                    <textarea id="reviewText" class="form-control" rows="3" placeholder="Tulis pengalamanmu..." style="display:none"></textarea>
                 </div>
-                <button id="btnReview" class="btn btn-primary">Kirim Ulasan</button>
-            </div>
-
-            <h4 class="text-theme mb-3">Komentar</h4>
-            <div id="commentsList" class="mb-3"></div>
-            <div id="commentFormBox" class="form-group">
-                <textarea id="commentText" class="form-control" rows="2" placeholder="Tulis komentar..."></textarea>
-                <button id="btnComment" class="btn btn-primary mt-2">Kirim Komentar</button>
-                <div id="commentNotice" class="text-muted small mt-2"></div>
+                <button id="btnReview" class="btn btn-primary" style="display:none">Kirim Ulasan</button>
             </div>
         </div>
     </div>
@@ -392,7 +390,7 @@
 
     function renderStars(n) {
         let s = '';
-        for (let i = 1; i <= 5; i++) s += `<span style="color:${i<=n?'#ffc107':'#e0e0e0'};font-size:20px;">★</span>`;
+        for (let i = 1; i <= 5; i++) s += `<span class="star ${i<=n?'active':''}">★</span>`;
         return s;
     }
 
@@ -400,88 +398,74 @@
         const picker = document.getElementById('starPicker');
         picker.innerHTML = '';
         for (let i = 1; i <= 5; i++) {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'btn btn-link p-0 mr-1';
-            btn.innerHTML = `<span style="color:#e0e0e0;font-size:24px;">★</span>`;
-            btn.addEventListener('click', () => {
+            const span = document.createElement('span');
+            span.className = 'star';
+            span.textContent = '★';
+            span.style.marginRight = '6px';
+            span.addEventListener('click', () => {
                 document.getElementById('reviewRating').value = i;
-                [...picker.children].forEach((b, idx) => { b.innerHTML = `<span style="color:${idx+1<=i?'#ffc107':'#e0e0e0'};font-size:24px;">★</span>`; });
+                [...picker.children].forEach((el, idx) => { el.classList.toggle('active', idx+1 <= i); });
+                document.getElementById('reviewText').style.display = 'block';
+                document.getElementById('btnReview').style.display = 'inline-block';
             });
-            picker.appendChild(btn);
+            picker.appendChild(span);
         }
-        document.getElementById('reviewRating').value = 5;
-        [...picker.children].forEach((b, idx) => { b.innerHTML = `<span style="color:${idx+1<=5?'#ffc107':'#e0e0e0'};font-size:24px;">★</span>`; });
     }
 
     async function loadReviews() {
         const res = await fetch(`/api/reviews?kostId=${id}`);
         const list = await res.json();
         let html = '';
-        if (!list || list.length === 0) html = '<p class="text-muted">Belum ada ulasan.</p>';
-        else list.forEach(r => { html += `<div class="mb-3">${renderStars(r.rating)}<div class="small text-muted">${r.userName || 'Anonim'} • ${new Date(r.createdAt).toLocaleString('id-ID')}</div><div>${r.text || ''}</div></div>`; });
-        document.getElementById('reviewsList').innerHTML = html;
-    }
-
-    async function loadComments() {
-        const res = await fetch(`/api/comments?kostId=${id}`);
-        const list = await res.json();
-        const byParent = {};
-        list.forEach(c => { (byParent[c.parentId || 0] = byParent[c.parentId || 0] || []).push(c); });
-        function renderThread(parentId) {
-            const arr = byParent[parentId || 0] || [];
-            let html = '';
-            arr.forEach(c => {
-                html += `<div class="mb-3" style="margin-left:${parentId?20:0}px;"><div class="small text-muted">${c.userName || 'User'} • ${new Date(c.createdAt).toLocaleString('id-ID')}</div><div>${c.content}</div><button class="btn btn-link p-0 small" onclick="openReply(${c.id})">Balas</button><div id="replyBox-${c.id}" class="mt-2" style="display:none;"><textarea class="form-control" rows="2" id="replyText-${c.id}" placeholder="Tulis balasan..."></textarea><button class="btn btn-primary btn-sm mt-2" onclick="submitReply(${c.id})">Kirim</button></div>`;
-                html += renderThread(c.id);
-                html += `</div>`;
-            });
-            return html;
+        if (!list || list.length === 0) {
+            html = '<p class="text-muted">Belum ada ulasan.</p>';
+            document.getElementById('avgRating').innerHTML = renderStars(0) + ' <span class="small text-muted">0.0/5</span>';
+        } else {
+            let sum = 0;
+            list.forEach(r => { sum += (r.rating || 0); html += `<div class="mb-3">${renderStars(r.rating)}<div class="small text-muted">${r.userName || 'Anonim'} • ${new Date(r.createdAt).toLocaleString('id-ID')}</div><div>${r.text || ''}</div></div>`; });
+            const avg = sum / list.length;
+            const rounded = Math.round(avg);
+            document.getElementById('avgRating').innerHTML = renderStars(rounded) + ` <span class="small text-muted">${avg.toFixed(1)}/5 dari ${list.length} ulasan</span>`;
         }
-        document.getElementById('commentsList').innerHTML = renderThread(null);
+        document.getElementById('reviewsList').innerHTML = html;
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && list && list.some(r => r.userId === user.id)) {
+            document.getElementById('reviewFormBox').style.display = 'none';
+        }
     }
 
-    function openReply(id) { const el = document.getElementById(`replyBox-${id}`); if (el) el.style.display = el.style.display==='none'?'block':'none'; }
-    async function submitReply(parentId) {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || user.role !== 'USER') { showAuthModal(); return; }
-        const content = document.getElementById(`replyText-${parentId}`).value;
-        const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, content, parentId };
-        const res = await fetch('/api/comments', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-        if (res.ok) { loadComments(); }
-    }
+    
+    
 
     document.getElementById('btnReview').addEventListener('click', async () => {
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user || user.role !== 'USER') { showAuthModal(); return; }
         const rating = parseInt(document.getElementById('reviewRating').value);
         const text = document.getElementById('reviewText').value;
+        if (!rating || rating < 1 || rating > 5) { alert('Pilih rating terlebih dahulu'); return; }
+        if (!text || text.trim() === '') { alert('Tulis ulasan terlebih dahulu'); return; }
         const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, rating, text };
         const res = await fetch('/api/reviews', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-        if (res.ok) { document.getElementById('reviewText').value=''; initStarPicker(); loadReviews(); }
-    });
-
-    document.getElementById('btnComment').addEventListener('click', async () => {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || user.role !== 'USER') { showAuthModal(); return; }
-        const content = document.getElementById('commentText').value;
-        const payload = { kostId: parseInt(id), userId: user.id, userName: user.name, content };
-        const res = await fetch('/api/comments', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-        if (res.ok) { document.getElementById('commentText').value=''; document.getElementById('commentNotice').innerText=''; loadComments(); }
-    });
-
-    function initAccessControls() {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || user.role !== 'USER') {
-            document.getElementById('commentNotice').innerText = 'Login sebagai USER untuk berkomentar.';
+        if (res.ok) {
+            document.getElementById('reviewText').value='';
+            document.getElementById('reviewText').style.display='none';
+            document.getElementById('btnReview').style.display='none';
+            document.getElementById('reviewRating').value='0';
+            initStarPicker();
+            loadReviews();
+        } else {
+            const msg = await res.text();
+            alert(msg || 'Gagal mengirim ulasan');
         }
-    }
+    });
+
+    
+
+    
 
     async function initExtras() {
         initStarPicker();
         await loadReviews();
-        await loadComments();
-        initAccessControls();
     }
 
     function showAuthModal() { $('#authModal').modal('show'); }

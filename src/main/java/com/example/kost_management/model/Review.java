@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"kostId", "userId"}))
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
